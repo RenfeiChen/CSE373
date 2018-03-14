@@ -1,0 +1,132 @@
+package datastructures.concrete.dictionaries;
+
+import datastructures.interfaces.IDictionary;
+import misc.exceptions.NoSuchKeyException;
+
+/**
+ * See IDictionary for more details on what this class should do
+ */
+public class ArrayDictionary<K, V> implements IDictionary<K, V> {
+    // You may not change or rename this field: we will be inspecting
+    // it using our private tests.
+    private Pair<K, V>[] pairs;
+
+    // You're encouraged to add extra fields (and helper methods) though!
+
+    public ArrayDictionary() {
+        pairs = this.makeArrayOfPairs(10000000);
+    }
+
+    /**
+     * This method will return a new, empty array of the given size
+     * that can contain Pair<K, V> objects.
+     *
+     * Note that each element in the array will initially be null.
+     */
+    @SuppressWarnings("unchecked")
+    private Pair<K, V>[] makeArrayOfPairs(int arraySize) {
+        // It turns out that creating arrays of generic objects in Java
+        // is complicated due to something known as 'type erasure'.
+        //
+        // We've given you this helper method to help simplify this part of
+        // your assignment. Use this helper method as appropriate when
+        // implementing the rest of this class.
+        //
+        // You are not required to understand how this method works, what
+        // type erasure is, or how arrays and generics interact. Do not
+        // modify this method in any way.
+        return (Pair<K, V>[]) (new Pair[arraySize]);
+
+    }
+
+    @Override
+    public V get(K key) {
+        int size = this.size();
+        for (int i = 0; i < size; i++) {
+            if ((this.pairs[i].key == null && key == null) || this.pairs[i].key.equals(key)) {
+                return this.pairs[i].value;
+            }
+        }
+        throw new NoSuchKeyException();
+    }
+
+    @Override
+    public void put(K key, V value) {
+        int size = this.size();
+        if (this.containsKey(key)) {
+            for (int i = 0; i < size; i++) {
+                if ((this.pairs[i].key == null && key == null) || this.pairs[i].key.equals(key)) {
+                    this.pairs[i].value = value;
+                    return;
+                }
+            }
+        }
+        else {
+            this.pairs[size] = new Pair<K, V>(key, value);
+            size++;
+            return;
+        }
+    }
+
+    @Override
+    public V remove(K key) {
+        int size = this.size();
+        int pos = 0;
+        if (!this.containsKey(key)) {
+            throw new NoSuchKeyException();
+        }
+        for (int i = 0; i < size; i++) {
+            if ((this.pairs[i].key == null && key == null) || this.pairs[i].key.equals(key)) {
+                pos = i;
+                break;
+            }
+        }
+        Pair<K, V> del = this.pairs[pos];
+        for (int i = pos; i < size - 1; i++) {
+            this.pairs[i] = this.pairs[i + 1];
+        }
+        this.pairs[size - 1] = null;
+        return del.value;
+    }
+
+    @Override
+    public boolean containsKey(K key) {
+        int size = this.size();
+        for (int i = 0; i < size; i++) {
+            if ((this.pairs[i].key == null && key == null) || this.pairs[i].key.equals(key)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public int size() {
+        int size = 0;
+        for (int i = 0; i < this.pairs.length; i++) {
+            if (this.pairs[i] == null) {
+                return size;
+            }
+            else {
+                size++;
+            }
+        }
+        return -1;
+    }
+
+    private static class Pair<K, V> {
+        public K key;
+        public V value;
+
+        // You may add constructors and methods to this class as necessary.
+        public Pair(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return this.key + "=" + this.value;
+        }
+    }
+}
